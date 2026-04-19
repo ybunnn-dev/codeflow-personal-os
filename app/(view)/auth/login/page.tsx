@@ -1,0 +1,15 @@
+import type { Metadata } from "next";
+import LoginForm from "./partials/login_form";
+
+export const metadata: Metadata = {
+  title: "Login | Class Funds",
+  description: "Sign in to your Class Funds account",
+};
+
+export default function LoginPage() {
+  return (
+    <main>
+      <LoginForm />
+    </main>
+  );
+}
