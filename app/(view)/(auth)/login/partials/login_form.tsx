@@ -27,7 +27,7 @@ export default function AuthPage() {
     if (res?.error) {
       setError("Invalid credentials");
     } else {
-      window.location.href = "/dashboard";
+      window.location.href = "/homepage";
     }
   };
 

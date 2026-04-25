@@ -1,3 +1,4 @@
+// auth.ts (or wherever you placed it)
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/app/lib/prisma";
@@ -24,6 +25,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           if (user && await bcrypt.compare(credentials.password as string, user.password!)) {
+            // This now perfectly matches the `User` interface in next-auth.d.ts
             return {
               id: user.id,
               name: [user.firstName, user.middleName, user.lastName, user.suffix]
@@ -55,19 +57,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   
   callbacks: {
     async jwt({ token, user }) {
+      // User object is only passed in the very first time they log in
       if (user) {
-        token.id = user.id;
-        token.fieldId = (user as any).fieldId;
-        token.fieldName = (user as any).fieldName;
+        token.id = user.id!;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+        token.fieldId = user.fieldId;
+        token.fieldName = user.fieldName;
       }
       return token;
     },
     
     async session({ session, token }) {
+      // Pass the data from the token to the frontend session
       if (token && session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).fieldId = token.fieldId;
-        (session.user as any).fieldName = token.fieldName;
+        session.user.id = token.id;
+        session.user.firstName = token.firstName;
+        session.user.lastName = token.lastName;
+        session.user.fieldId = token.fieldId;
+        session.user.fieldName = token.fieldName;
       }
       return session;
     },

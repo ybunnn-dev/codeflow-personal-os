@@ -1,6 +1,11 @@
+// tailwind.config.ts
+
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  // --- ADD THIS LINE HERE ---
+  darkMode: "class",
+  
   content: [
     // This strictly matches your structure: app/view/...
     "./app/**/*.{ts,tsx}",
