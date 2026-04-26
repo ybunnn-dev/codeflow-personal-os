@@ -76,7 +76,17 @@ export default function WorkHoursPage() {
     String(selectedDate.getDate()).padStart(2, '0'),
   ].join('-');
 
-  const currentDayRecord = workHoursRecords.find(record => record.date === selectedDateString);
+  const normalizeDate = (dateVal: string) => {
+    if (!dateVal) return "";
+    return dateVal.substring(0, 10); // Safely extracts "YYYY-MM-DD" from any format
+  };
+
+  // Then use it in both places:
+  const currentDayRecord = workHoursRecords.find(
+    record => normalizeDate(record.date) === selectedDateString
+  );
+
+  console.log(currentDayRecord);
 
   const timeToMins = (t: string) => {
     if (!t) return 0;
@@ -84,7 +94,9 @@ export default function WorkHoursPage() {
     return h * 60 + m;
   };
 
+  
   const dailyStatuses = workHoursRecords.reduce((acc, record) => {
+  const dateKey = normalizeDate(record.date); // ← normalized key
     let totalMins = 0;
     if (record.time_in_am && record.time_out_am)
       totalMins += timeToMins(record.time_out_am) - timeToMins(record.time_in_am);
@@ -93,10 +105,10 @@ export default function WorkHoursPage() {
 
     const hours = totalMins / 60;
 
-    if (hours <= 0)                 acc[record.date] = "No Record";
-    else if (hours < requiredHours) acc[record.date] = "Undertime";
-    else if (hours > requiredHours) acc[record.date] = "Overtime";
-    else                            acc[record.date] = "Exact";
+    if (hours <= 0)                 acc[dateKey] = "No Record";
+    else if (hours < requiredHours) acc[dateKey] = "Undertime";
+    else if (hours > requiredHours) acc[dateKey] = "Overtime";
+    else                            acc[dateKey] = "Exact";
 
     return acc;
   }, {} as Record<string, string>);

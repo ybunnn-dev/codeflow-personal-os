@@ -37,7 +37,7 @@ export default function Navigation() {
   const activeApp = getActiveApp(pathname);
 
   return (
-    <nav className="w-full bg-[#F4F4F0] dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
+    <nav className="w-full bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
       <div
         className={`mx-auto px-4 sm:px-6 lg:px-8 ${
             isHomepage ? "max-w-7xl" : "max-w-full"

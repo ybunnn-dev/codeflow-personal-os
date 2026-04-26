@@ -28,10 +28,14 @@ export async function GET(request: Request) {
   let dateFilter = {};
   if (month) {
     const [year, monthStr] = month.split('-');
-    const startDate = new Date(parseInt(year), parseInt(monthStr) - 1, 1);
-    const endDate = new Date(parseInt(year), parseInt(monthStr), 1);
+    const y = parseInt(year);
+    const m = parseInt(monthStr) - 1;
+    
+    // Use UTC boundaries to avoid timezone cutoff issues
+    const startDate = new Date(Date.UTC(y, m, 1));
+    const endDate = new Date(Date.UTC(y, m + 1, 1));
     dateFilter = { date: { gte: startDate, lt: endDate } };
-  }
+    }
 
   const [workHours, requiredHours] = await Promise.all([
     prisma.workHours.findMany({
@@ -43,15 +47,22 @@ export async function GET(request: Request) {
   ]);
 
   // Normalize all records to plain strings before sending to frontend
-  const normalizedWorkHours = workHours.map(record => ({
-    id: record.id,
-    userId: record.userId,
-    date: toLocalDateString(record.date),           // "2026-02-20"
-    time_in_am:  toTimeString(record.time_in_am),   // "07:20"
-    time_out_am: toTimeString(record.time_out_am),  // "12:00"
-    time_in_pm:  toTimeString(record.time_in_pm),   // "13:00"
-    time_out_pm: toTimeString(record.time_out_pm),  // "17:00"
-  }));
+  const normalizedWorkHours = workHours.map(record => {
+    console.log("RAW record.date:", record.date);
+    console.log("RAW record.date ISO:", record.date?.toISOString());
+    console.log("NORMALIZED date:", toLocalDateString(record.date));
+    console.log("---");
+    
+    return {
+        id: record.id,
+        userId: record.userId,
+        date: toLocalDateString(record.date),
+        time_in_am:  toTimeString(record.time_in_am),
+        time_out_am: toTimeString(record.time_out_am),
+        time_in_pm:  toTimeString(record.time_in_pm),
+        time_out_pm: toTimeString(record.time_out_pm),
+    };
+    });
 
   return NextResponse.json({ workHours: normalizedWorkHours, requiredHours });
 }
