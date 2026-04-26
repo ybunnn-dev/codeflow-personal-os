@@ -47,7 +47,7 @@ export default function SpecificDate({
   }, [selectedDate, initialData]);
 
   // --- Real-Time Calculation Logic ---
-  const { totalHours, status } = useMemo(() => {
+  const { totalHours, status, differenceHours } = useMemo(() => {
     // Helper to convert "HH:mm" to total minutes
     const timeToMins = (t: string) => {
       if (!t) return 0;
@@ -79,15 +79,27 @@ export default function SpecificDate({
     const hours = Math.max(0, totalMins / 60);
     const formattedHours = Math.round(hours * 100) / 100;
 
-    // Determine Status
+    // Determine Status & Difference
     let currentStatus = "No Record";
+    let diff = 0;
+
     if (formattedHours > 0) {
-      if (formattedHours < requiredHours) currentStatus = "Undertime";
-      else if (formattedHours > requiredHours) currentStatus = "Overtime";
-      else currentStatus = "Exact Time";
+      if (formattedHours < requiredHours) {
+        currentStatus = "Undertime";
+        diff = requiredHours - formattedHours;
+      } else if (formattedHours > requiredHours) {
+        currentStatus = "Overtime";
+        diff = formattedHours - requiredHours;
+      } else {
+        currentStatus = "Exact Time";
+      }
     }
 
-    return { totalHours: formattedHours, status: currentStatus };
+    return { 
+      totalHours: formattedHours, 
+      status: currentStatus,
+      differenceHours: Math.round(diff * 100) / 100 // Ensure clean decimals
+    };
   }, [timeInAm, timeOutAm, timeInPm, timeOutPm, requiredHours]);
 
   // --- UI Helpers ---
@@ -167,21 +179,38 @@ export default function SpecificDate({
         </div>
 
         {/* --- Real-Time Status Display --- */}
-        <div className="mt-2 p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Rendered</span>
-            <span className="text-2xl font-bold">
-              {totalHours > 0 
-                ? `${Math.floor(totalHours)}h ${Math.round((totalHours % 1) * 60)}m` 
-                : '--'}
-            </span>
+        <div className="mt-2 flex flex-col bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div className="p-4 flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Rendered</span>
+              <span className="text-2xl font-bold">
+                {totalHours > 0 
+                  ? `${Math.floor(totalHours)}h ${Math.round((totalHours % 1) * 60)}m` 
+                  : '--'}
+              </span>
+            </div>
+            <div className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wide ${getStatusColor()}`}>
+              {status}
+            </div>
           </div>
-          <div className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wide ${getStatusColor()}`}>
-            {status}
-          </div>
+
+
+          {status !== "No Record" && status !== "Exact Time" && differenceHours > 0 && (
+            <div className="px-4 py-3 bg-white/50 dark:bg-gray-900/30 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between transition-all">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {status === "Overtime" ? "Excess Time (Overtime)" : "Lacking Time (Undertime)"}
+              </span>
+              <span className={`text-sm font-bold ${
+                status === "Overtime" ? "text-blue-600 dark:text-blue-400" : "text-orange-600 dark:text-orange-400"
+              }`}>
+                {status === "Overtime" ? "+" : "-"}
+                {Math.floor(differenceHours)}h {Math.round((differenceHours % 1) * 60)}m
+              </span>
+            </div>
+          )}
         </div>
         
-        <button onClick={() => setIsModalOpen(true)} disabled={isProcessing} className="w-full py-2 mt-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button onClick={() => setIsModalOpen(true)} disabled={isProcessing} className="w-full py-2 mt-2 bg-mocha text-white rounded-md dark:bg-[#d88a64] hover:bg-mocha/80 disabled:opacity-50 disabled:cursor-not-allowed font-bold">
           Save Daily Logs
         </button>
       </div>

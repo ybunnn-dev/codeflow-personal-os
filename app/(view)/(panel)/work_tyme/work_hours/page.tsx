@@ -108,7 +108,7 @@ export default function WorkHoursPage() {
     if (hours <= 0)                 acc[dateKey] = "No Record";
     else if (hours < requiredHours) acc[dateKey] = "Undertime";
     else if (hours > requiredHours) acc[dateKey] = "Overtime";
-    else                            acc[dateKey] = "Exact";
+    else                            acc[dateKey] = "Exact Time";
 
     return acc;
   }, {} as Record<string, string>);

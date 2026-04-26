@@ -5,7 +5,8 @@ interface CalendarProps {
   onDateSelect: (date: Date) => void;
   viewingMonth: Date;
   onMonthChange: (date: Date) => void;
-  dailyStatuses?: Record<string, "Exact" | "Undertime" | "Overtime" | "No Record">;
+  // Updated "Exact" to "Exact Time" to match SpecificDate logic
+  dailyStatuses?: Record<string, "Exact Time" | "Undertime" | "Overtime" | "No Record">;
 }
 
 export default function Calendar({ 
@@ -36,12 +37,18 @@ export default function Calendar({
     );
   };
 
-  const getStatusColor = (status?: string) => {
+  // Exact color mapping pulled from your SpecificDate component
+  const getStatusStyles = (status?: string) => {
     switch (status) {
-      case "Exact": return "bg-green-500 dark:bg-green-400";
-      case "Overtime": return "bg-blue-500 dark:bg-blue-400";
-      case "Undertime": return "bg-orange-500 dark:bg-orange-400";
-      default: return "bg-transparent";
+      case "Exact Time": 
+        return "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
+      case "Overtime": 
+        return "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800";
+      case "Undertime": 
+        return "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800";
+      default: 
+        // We likely don't render "No Record" in the calendar to save space, but if you want to, here are the styles:
+        return "bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700";
     }
   };
 
@@ -100,20 +107,23 @@ export default function Calendar({
               key={day}
               onClick={() => onDateSelect(currentDate)}
               className={`
-                relative flex flex-col items-center justify-center p-3 rounded-lg border transition-all
+                relative flex flex-col items-center justify-center gap-1.5 p-2 rounded-lg border transition-all h-24
                 ${isSelected 
-                  ? "border-blue-600 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/40" 
-                  : "border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 bg-white dark:bg-gray-800"}
-                ${isToday && !isSelected ? "ring-2 ring-blue-200 dark:ring-blue-800" : ""}
-                h-24
+                  ? "border-[#D98A5F] bg-[#D98A5F]/10 dark:bg-[#D98A5F]/20 shadow-sm" 
+                  : "border-gray-200 dark:border-gray-700 hover:border-[#D98A5F]/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 bg-white dark:bg-gray-800"}
+                ${isToday && !isSelected ? "ring-2 ring-[#D98A5F]/30 dark:ring-[#D98A5F]/40" : ""}
               `}
             >
-              <span className={`text-lg ${isSelected ? "font-bold text-blue-700 dark:text-blue-400" : "text-gray-700 dark:text-gray-200"}`}>
+              <span className={`text-base font-medium ${isSelected ? "text-[#D98A5F]" : "text-gray-700 dark:text-gray-200"}`}>
                 {day}
               </span>
-              <div className="mt-2 h-2 flex gap-1">
+              
+              {/* Removed mt-auto here so it naturally sits below the date */}
+              <div className="w-full flex justify-center px-1">
                 {status && status !== "No Record" && (
-                  <span className={`w-2 h-2 rounded-full ${getStatusColor(status)}`} title={status}></span>
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border w-full text-center truncate ${getStatusStyles(status)}`} title={status}>
+                    {status}
+                  </span>
                 )}
               </div>
             </button>
