@@ -24,6 +24,8 @@ model User {
 
   accounts   Account[]
   sessions   Session[]
+  workHours  WorkHours[]
+  requiredHours RequiredHours?
 
   @@map("users")
 }
@@ -89,4 +91,36 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model WorkHours {
+  id          String    @id @default(cuid())
+  userId      String
+  
+  date        DateTime  @db.Date
+  
+  // @db.Time ensures MySQL uses its native TIME type (e.g., "08:00:00")
+  time_in_am  DateTime? @db.Time
+  time_out_am DateTime? @db.Time
+  time_in_pm  DateTime? @db.Time
+  time_out_pm DateTime? @db.Time
+
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("work_hours")
+}
+
+model RequiredHours {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  hours     Float    
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // Automatically updates on modification
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("required_hours")
 }

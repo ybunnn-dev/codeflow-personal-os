@@ -23,7 +23,7 @@ export default function AppsShortcut() {
     { name: "Smart Doc", href: "/smart_doc", color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" },
     { name: "PM+", href: "#", color: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" },
     { name: "Inventory++", href: "#", color: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400" },
-    { name: "WorkTyme", href: "#", color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400" },
+    { name: "WorkTyme", href: "/work_tyme/dashboard", color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400" },
   ];
 
   return (

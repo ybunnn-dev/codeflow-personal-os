@@ -1,28 +1,33 @@
 // app/(view)/(panel)/homepage/components/tools_section.tsx
 
 import React from 'react';
+import Link from 'next/link'; // 1. Import Link
 
-// Define your integrated applications here
+// 2. Add the href paths to your applications array
 const applications = [
   {
     name: "Smart Doc",
     description: "An archiving system for managing, routing, and tracking soft copies of documents.",
     color: "bg-blue-100 dark:bg-blue-900/30",
+    href: "/smart_doc" 
   },
   {
     name: "PM+",
     description: "A comprehensive project manager system containing essential project management and tracking tools.",
     color: "bg-purple-100 dark:bg-purple-900/30",
+    href: "/pm_plus"
   },
   {
     name: "Inventory++",
     description: "A smart inventory management system designed to seamlessly track stocks and resources.",
     color: "bg-green-100 dark:bg-green-900/30",
+    href: "/inventory"
   },
   {
     name: "WorkTyme",
     description: "A smart OJT time tracker for logging hours and managing internship progress.",
     color: "bg-orange-100 dark:bg-orange-900/30",
+    href: "/work_tyme/dashboard" // <--- Points directly to your new layout!
   }
 ];
 
@@ -40,29 +45,30 @@ export default function ToolsSection() {
         
         {/* Render Actual Apps */}
         {applications.map((app, index) => (
-          <div 
+          // 3. Change this from a <div> to a <Link>
+          <Link 
             key={index} 
-            className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-4 flex gap-4 h-40 cursor-pointer border border-transparent dark:border-slate-700"
+            href={app.href}
+            className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-4 flex gap-4 h-40 cursor-pointer border border-transparent dark:border-slate-700 block group"
           >
-            {/* App Icon Placeholder (Colored block) */}
-            <div className={`w-24 h-24 ${app.color} rounded-lg flex-shrink-0 flex items-center justify-center`}>
-               {/* You can swap this text out for actual SVG icons later */}
+            {/* App Icon Placeholder */}
+            <div className={`w-24 h-24 ${app.color} rounded-lg flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-105`}>
                <span className="text-2xl font-bold opacity-40">{app.name.charAt(0)}</span>
             </div>
             
             {/* App Details */}
             <div className="flex flex-col">
-              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg mb-1">
+              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg mb-1 group-hover:text-[#D98A5F] transition-colors">
                 {app.name}
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-4 leading-relaxed">
                 {app.description}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
 
-        {/* Render 2 Empty Placeholders to complete the 3x2 grid look */}
+        {/* Render 2 Empty Placeholders */}
         {[...Array(2)].map((_, index) => (
           <div 
             key={`empty-${index}`} 
