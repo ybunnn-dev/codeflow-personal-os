@@ -17,10 +17,10 @@ export default function LineGraph({ chartData = [] }: LineGraphProps) {
   
   if (!chartData || chartData.length === 0) {
     return (
-      <div className="max-w-full max-h-full lg:max-h-full h-full w-full bg-slate-50 dark:bg-[#1a1b1d] rounded-md p-4 md:py-6 md:px-3 flex flex-col min-h-[350px]">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-transparent dark:border-slate-700/50 shadow-sm min-h-[350px] flex flex-col w-full h-full max-w-full">
         <div className="flex justify-between items-start mb-4">
-          <div className="px-3">
-            <h5 className="text-lg text-slate-800 dark:text-white font-semibold">Average Hours Per Month</h5>
+          <div>
+            <h5 className="text-lg font-bold text-slate-900 dark:text-slate-100">Average Hours Per Month</h5>
           </div>
         </div>
         <div className="flex-1 w-full rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400">
@@ -42,7 +42,7 @@ export default function LineGraph({ chartData = [] }: LineGraphProps) {
 
   const options: ApexCharts.ApexOptions = {
     chart: {
-      type: "area", // Changed to area based on the Laravel example
+      type: "area", 
       fontFamily: "inherit",
       toolbar: { show: false },
       zoom: { enabled: false },
@@ -70,7 +70,6 @@ export default function LineGraph({ chartData = [] }: LineGraphProps) {
         gradientToColors: [brandColor],
       },
     },
-    // Kept tooltips enabled for better React Dashboard UX, using dark theme so it looks good everywhere
     tooltip: { 
       enabled: true,
       theme: "dark",
@@ -92,21 +91,21 @@ export default function LineGraph({ chartData = [] }: LineGraphProps) {
       }
     },
     grid: {
-      borderColor: 'rgba(107, 114, 128, 0.2)', // Uses an rgba value to blend seamlessly with both light and #1a1b1d dark mode
+      borderColor: 'rgba(107, 114, 128, 0.2)',
       strokeDashArray: 4
     },
   };
 
   return (
-    <div className="max-w-full max-h-full lg:max-h-full h-full w-full bg-slate-50 dark:bg-[#1a1b1d] rounded-md p-4 md:py-6 md:px-3 flex flex-col shadow-sm">
-      <div className="flex justify-between items-start">
-        <div className="px-3">
-          <h5 className="text-lg text-slate-800 dark:text-white font-semibold">Average Hours Rendered</h5>
-          <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">Monthly breakdown of OJT hours.</p>
+    <div className="bg-white dark:bg-slate-900 p-4 md:py-6 md:px-6 rounded-xl border border-transparent dark:border-slate-700/50 shadow-sm flex flex-col w-full h-full max-w-full">
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          <h5 className="text-lg font-bold text-slate-900 dark:text-slate-100">Average Hours Rendered</h5>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Monthly breakdown of OJT hours.</p>
         </div>
       </div>
       
-      <div className="flex-1 w-full -ml-3 mt-4">
+      <div className="flex-1 w-full -ml-3 mt-2">
         <ReactApexChart 
           options={options} 
           series={series} 
@@ -116,7 +115,7 @@ export default function LineGraph({ chartData = [] }: LineGraphProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 border-slate-200 dark:border-gray-700/50 border-t mt-2"></div>
+      <div className="grid grid-cols-1 border-t border-slate-200 dark:border-slate-700/50 mt-2"></div>
     </div>
   );
 }
