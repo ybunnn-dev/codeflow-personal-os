@@ -12,13 +12,21 @@ npm install
 
 ## Environment Setup
 
-Create a `.env` file:
-Create database "codeflow" on mysql
+1. Create a database named `codeflow` in MySQL.
+
+2. Generate your authentication secret:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+3. Create a `.env` file in the root directory:
 
 ```env
 DATABASE_URL="your_database_url"
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="oZTnODGlSusbNt5WPENHXnRcinQdMdJJiQw5wbsi7sA="
+NEXTAUTH_SECRET="paste_generated_secret_here"
+
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
