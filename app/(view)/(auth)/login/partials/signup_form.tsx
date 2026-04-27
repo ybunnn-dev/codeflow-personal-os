@@ -55,7 +55,7 @@ export default function SignUpForm({ onLoginClick }: { onLoginClick: () => void 
     <div className="w-full max-w-lg space-y-8 bg-white px-8 py-10 sm:px-12">
       <div className="text-left">
         <h2 className="text-3xl font-bold tracking-tight text-text_heavy">Create Account</h2>
-        <p className="mt-2 text-sm text-text_light">Join your class fund management system today.</p>
+        <p className="mt-2 text-sm text-text_light">Join CodeFlow today.</p>
       </div>
 
       {error && (

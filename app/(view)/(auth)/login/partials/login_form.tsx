@@ -115,11 +115,11 @@ export default function AuthPage() {
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-light_brown rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
 
         <div className="relative z-10 text-center px-12">
-          <h1 className="text-5xl font-bold text-text_heavy mb-6">Class Funds</h1>
+          <h1 className="text-5xl font-bold text-text_heavy mb-6">CodeFlow</h1>
           
           <div className="relative h-16 w-full"> 
              <p className={`text-xl text-text_semi transition-opacity duration-300 absolute w-full top-0 ${isSignUp ? "opacity-0" : "opacity-100"}`}>
-               Manage your class finances with transparency and ease.
+                Your Personal Operating System.
              </p>
              <p className={`text-xl text-text_semi transition-opacity duration-300 absolute w-full top-0 ${isSignUp ? "opacity-100" : "opacity-0"}`}>
                Already a member? <br/> Slide back to login.
