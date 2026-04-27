@@ -5,7 +5,7 @@ A personal productivity system built with Next.js, Prisma, and Tailwind CSS.
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/codeflow-personal-os.git
+git clone https://github.com/ybunnn-dev/codeflow-personal-os
 cd codeflow-personal-os
 npm install
 ```
@@ -13,6 +13,7 @@ npm install
 ## Environment Setup
 
 Create a `.env` file:
+Create database "codeflow" on mysql
 
 ```env
 DATABASE_URL="your_database_url"
