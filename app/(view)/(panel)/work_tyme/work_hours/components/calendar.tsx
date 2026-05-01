@@ -5,8 +5,9 @@ interface CalendarProps {
   onDateSelect: (date: Date) => void;
   viewingMonth: Date;
   onMonthChange: (date: Date) => void;
-  // Updated "Exact" to "Exact Time" to match SpecificDate logic
   dailyStatuses?: Record<string, "Exact Time" | "Undertime" | "Overtime" | "No Record">;
+  /** Optional slot — renders between the month title and the Prev/Next buttons */
+  actions?: React.ReactNode;
 }
 
 export default function Calendar({ 
@@ -14,7 +15,8 @@ export default function Calendar({
   onDateSelect,
   viewingMonth,
   onMonthChange,
-  dailyStatuses = {} 
+  dailyStatuses = {},
+  actions,
 }: CalendarProps) {
   const daysInMonth = new Date(viewingMonth.getFullYear(), viewingMonth.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(viewingMonth.getFullYear(), viewingMonth.getMonth(), 1).getDay();
@@ -37,7 +39,6 @@ export default function Calendar({
     );
   };
 
-  // Exact color mapping pulled from your SpecificDate component
   const getStatusStyles = (status?: string) => {
     switch (status) {
       case "Exact Time": 
@@ -47,7 +48,6 @@ export default function Calendar({
       case "Undertime": 
         return "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800";
       default: 
-        // We likely don't render "No Record" in the calendar to save space, but if you want to, here are the styles:
         return "bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700";
     }
   };
@@ -55,10 +55,21 @@ export default function Calendar({
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 p-4 rounded-xl transition-colors">
       <div className="flex items-center justify-between mb-6">
+        {/* Left: month title */}
         <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
           {viewingMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
         </h2>
-        <div className="flex gap-2">
+
+        {/* Right: action buttons + nav */}
+        <div className="flex items-center gap-2">
+          {/* Injected export buttons */}
+          {actions}
+
+          {/* Divider */}
+          {actions && (
+            <div className="w-px h-5 bg-gray-200 dark:bg-gray-700" />
+          )}
+
           <button 
             onClick={handlePrevMonth} 
             className="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -118,7 +129,6 @@ export default function Calendar({
                 {day}
               </span>
               
-              {/* Removed mt-auto here so it naturally sits below the date */}
               <div className="w-full flex justify-center px-1">
                 {status && status !== "No Record" && (
                   <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border w-full text-center truncate ${getStatusStyles(status)}`} title={status}>

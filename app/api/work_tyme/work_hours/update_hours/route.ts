@@ -10,7 +10,7 @@ export async function PUT(request: Request) {
   const data = await request.json();
   const { id, ...payload } = data;
 
-  // ✅ Extract the correct local date string from the ISO date sent by client
+  // Extract the correct local date string from the ISO date sent by client
   // e.g. "2026-02-19T16:00:00.000Z" in UTC = Feb 20 in PHT
   // So we parse it as local time instead
   const localDate = new Date(payload.date);

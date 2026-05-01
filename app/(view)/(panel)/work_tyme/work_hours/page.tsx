@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import Calendar from "./components/calendar";
 import SpecificDate from "./components/specific_date";
 import ReqHours from "./components/req_hours";
+import DTRGenerator from "./components/dtr_generator";
 
 export default function WorkHoursPage() {
   const { data: session, status } = useSession();
@@ -38,7 +39,6 @@ export default function WorkHoursPage() {
     }
   }, [currentUserId]);
 
-  // Fetch when auth is ready OR when viewingMonth changes
   useEffect(() => {
     if (status === "authenticated" && currentUserId) {
       fetchWorkData(viewingMonth);
@@ -47,7 +47,6 @@ export default function WorkHoursPage() {
 
   const handleMonthChange = (newMonth: Date) => {
     setViewingMonth(newMonth);
-    // useEffect above will fire automatically since viewingMonth changed
   };
 
   const handleDateSelect = (date: Date) => {
@@ -78,15 +77,12 @@ export default function WorkHoursPage() {
 
   const normalizeDate = (dateVal: string) => {
     if (!dateVal) return "";
-    return dateVal.substring(0, 10); // Safely extracts "YYYY-MM-DD" from any format
+    return dateVal.substring(0, 10);
   };
 
-  // Then use it in both places:
   const currentDayRecord = workHoursRecords.find(
     record => normalizeDate(record.date) === selectedDateString
   );
-
-  console.log(currentDayRecord);
 
   const timeToMins = (t: string) => {
     if (!t) return 0;
@@ -94,9 +90,8 @@ export default function WorkHoursPage() {
     return h * 60 + m;
   };
 
-  
   const dailyStatuses = workHoursRecords.reduce((acc, record) => {
-  const dateKey = normalizeDate(record.date); // ← normalized key
+    const dateKey = normalizeDate(record.date);
     let totalMins = 0;
     if (record.time_in_am && record.time_out_am)
       totalMins += timeToMins(record.time_out_am) - timeToMins(record.time_in_am);
@@ -113,6 +108,29 @@ export default function WorkHoursPage() {
     return acc;
   }, {} as Record<string, string>);
 
+  // ── Export buttons passed into the Calendar header ─────────────────────
+  const exportActions = (
+    <>
+      <DTRGenerator viewingMonth={viewingMonth} format="docx">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D98A5F] hover:bg-[#c97a4f] text-white text-xs font-semibold transition-colors shadow-sm">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          Export DTR
+        </span>
+      </DTRGenerator>
+
+      <DTRGenerator viewingMonth={viewingMonth} format="xlsx">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold transition-colors shadow-sm">
+          <svg className="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
+          </svg>
+          Excel
+        </span>
+      </DTRGenerator>
+    </>
+  );
+
   return (
     <div className="grid grid-cols-4 gap-6 h-full">
 
@@ -123,6 +141,7 @@ export default function WorkHoursPage() {
           viewingMonth={viewingMonth}
           onMonthChange={handleMonthChange}
           dailyStatuses={dailyStatuses}
+          actions={exportActions}
         />
       </div>
 
