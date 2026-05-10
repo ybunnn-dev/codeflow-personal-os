@@ -48,38 +48,37 @@ export default function SpecificDate({
 
   // --- Real-Time Calculation Logic ---
   const { totalHours, status, differenceHours } = useMemo(() => {
-    // Helper to convert "HH:mm" to total minutes
     const timeToMins = (t: string) => {
       if (!t) return 0;
       const [h, m] = t.split(':').map(Number);
       return h * 60 + m;
     };
 
+    const LUNCH_START = 12 * 60;
+    const LUNCH_END   = 13 * 60;
+
     let totalMins = 0;
-    const amInMins = timeToMins(timeInAm);
+    const amInMins  = timeToMins(timeInAm);
     const amOutMins = timeToMins(timeOutAm);
-    const pmInMins = timeToMins(timeInPm);
+    const pmInMins  = timeToMins(timeInPm);
     const pmOutMins = timeToMins(timeOutPm);
 
-    // Scenario 1: User explicitly fills out pairs
-    if (timeInAm && timeOutAm) totalMins += (amOutMins - amInMins);
-    if (timeInPm && timeOutPm) totalMins += (pmOutMins - pmInMins);
+    // AM session: always ends at 12:00 PM regardless of recorded time-out
+    if (timeInAm && timeOutAm) totalMins += LUNCH_START - amInMins;
 
-    // Scenario 2: "Lazy Input" - User just puts AM IN and PM OUT
+    // PM session: always starts at 1:00 PM regardless of recorded time-in
+    if (timeInPm && timeOutPm) totalMins += pmOutMins - LUNCH_END;
+
+    // Lazy input: only AM IN + PM OUT, deduct fixed 1hr lunch
     if (timeInAm && !timeOutAm && !timeInPm && timeOutPm) {
       let diff = pmOutMins - amInMins;
-      // Deduct 1 hour (60 mins) for lunch if the span crosses 12:00 PM to 1:00 PM
-      if (amInMins <= 12 * 60 && pmOutMins >= 13 * 60) {
-        diff -= 60;
-      }
+      if (amInMins <= LUNCH_START && pmOutMins >= LUNCH_END) diff -= 60;
       totalMins += diff;
     }
 
-    // Convert back to hours (rounded to 2 decimal places)
     const hours = Math.max(0, totalMins / 60);
     const formattedHours = Math.round(hours * 100) / 100;
 
-    // Determine Status & Difference
     let currentStatus = "No Record";
     let diff = 0;
 
@@ -95,10 +94,10 @@ export default function SpecificDate({
       }
     }
 
-    return { 
-      totalHours: formattedHours, 
+    return {
+      totalHours: formattedHours,
       status: currentStatus,
-      differenceHours: Math.round(diff * 100) / 100 // Ensure clean decimals
+      differenceHours: Math.round(diff * 100) / 100
     };
   }, [timeInAm, timeOutAm, timeInPm, timeOutPm, requiredHours]);
 
