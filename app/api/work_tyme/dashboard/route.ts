@@ -14,19 +14,30 @@ function calculateDailyHours(timeInAm: string, timeOutAm: string, timeInPm: stri
     return h * 60 + m;
   };
 
+  const LUNCH_START = 12 * 60; // 12:00 PM — AM session always ends here
+  const LUNCH_END   = 13 * 60; // 1:00 PM  — PM session always starts here
+
   let totalMins = 0;
-  const amInMins = timeToMins(timeInAm);
+  const amInMins  = timeToMins(timeInAm);
   const amOutMins = timeToMins(timeOutAm);
-  const pmInMins = timeToMins(timeInPm);
+  const pmInMins  = timeToMins(timeInPm);
   const pmOutMins = timeToMins(timeOutPm);
 
-  if (timeInAm && timeOutAm) totalMins += (amOutMins - amInMins);
-  if (timeInPm && timeOutPm) totalMins += (pmOutMins - pmInMins);
+  // AM session: ignore recorded time-out, always treat end as 12:00 PM
+  if (timeInAm && timeOutAm) {
+    totalMins += LUNCH_START - amInMins;
+  }
 
+  // PM session: ignore recorded time-in, always treat start as 1:00 PM
+  if (timeInPm && timeOutPm) {
+    totalMins += pmOutMins - LUNCH_END;
+  }
+
+  // Continuous shift (no lunch times recorded): deduct fixed 1hr lunch
   if (timeInAm && !timeOutAm && !timeInPm && timeOutPm) {
     let diff = pmOutMins - amInMins;
-    if (amInMins <= 12 * 60 && pmOutMins >= 13 * 60) {
-      diff -= 60; // 1 hr lunch deduction
+    if (amInMins <= LUNCH_START && pmOutMins >= LUNCH_END) {
+      diff -= 60;
     }
     totalMins += diff;
   }

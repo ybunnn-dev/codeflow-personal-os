@@ -48,11 +48,7 @@ export async function GET(request: Request) {
 
   // Normalize all records to plain strings before sending to frontend
   const normalizedWorkHours = workHours.map(record => {
-    console.log("RAW record.date:", record.date);
-    console.log("RAW record.date ISO:", record.date?.toISOString());
-    console.log("NORMALIZED date:", toLocalDateString(record.date));
-    console.log("---");
-    
+   
     return {
         id: record.id,
         userId: record.userId,
