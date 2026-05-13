@@ -105,6 +105,8 @@ model WorkHours {
   time_in_pm  DateTime? @db.Time
   time_out_pm DateTime? @db.Time
 
+  remarks     String? 
+
   createdAt   DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

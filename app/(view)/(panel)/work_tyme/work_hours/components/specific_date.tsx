@@ -11,13 +11,14 @@ interface WorkHourRecord {
   time_out_am: string;
   time_in_pm: string;
   time_out_pm: string;
+  remarks?: string; // <-- added
 }
 
 interface SpecificDateProps {
   selectedDate: Date;
   userId: string;
   initialData?: WorkHourRecord | null;
-  requiredHours: number; // We need this to calculate the status!
+  requiredHours: number;
   onRefreshData: () => void;
 }
 
@@ -34,6 +35,7 @@ export default function SpecificDate({
   const [timeOutAm, setTimeOutAm] = useState(toTimeInput(initialData?.time_out_am));
   const [timeInPm, setTimeInPm]   = useState(toTimeInput(initialData?.time_in_pm));
   const [timeOutPm, setTimeOutPm] = useState(toTimeInput(initialData?.time_out_pm));
+  const [remarks, setRemarks]     = useState(initialData?.remarks || ""); // <-- added
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,6 +46,7 @@ export default function SpecificDate({
     setTimeOutAm(toTimeInput(initialData?.time_out_am));
     setTimeInPm(toTimeInput(initialData?.time_in_pm));
     setTimeOutPm(toTimeInput(initialData?.time_out_pm));
+    setRemarks(initialData?.remarks || ""); // <-- added
   }, [selectedDate, initialData]);
 
   // --- Real-Time Calculation Logic ---
@@ -63,13 +66,9 @@ export default function SpecificDate({
     const pmInMins  = timeToMins(timeInPm);
     const pmOutMins = timeToMins(timeOutPm);
 
-    // AM session: always ends at 12:00 PM regardless of recorded time-out
     if (timeInAm && timeOutAm) totalMins += LUNCH_START - amInMins;
-
-    // PM session: always starts at 1:00 PM regardless of recorded time-in
     if (timeInPm && timeOutPm) totalMins += pmOutMins - LUNCH_END;
 
-    // Lazy input: only AM IN + PM OUT, deduct fixed 1hr lunch
     if (timeInAm && !timeOutAm && !timeInPm && timeOutPm) {
       let diff = pmOutMins - amInMins;
       if (amInMins <= LUNCH_START && pmOutMins >= LUNCH_END) diff -= 60;
@@ -126,6 +125,7 @@ export default function SpecificDate({
         time_out_am: timeOutAm,
         time_in_pm: timeInPm,
         time_out_pm: timeOutPm,
+        remarks, // <-- added
       };
 
       const response = await fetch("/api/work_tyme/work_hours/update_hours", {
@@ -177,7 +177,7 @@ export default function SpecificDate({
           </div>
         </div>
 
-        {/* --- Real-Time Status Display --- */}
+        {/* Status Display */}
         <div className="mt-2 flex flex-col bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
           <div className="p-4 flex items-center justify-between">
             <div className="flex flex-col">
@@ -193,7 +193,6 @@ export default function SpecificDate({
             </div>
           </div>
 
-
           {status !== "No Record" && status !== "Exact Time" && differenceHours > 0 && (
             <div className="px-4 py-3 bg-white/50 dark:bg-gray-900/30 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between transition-all">
               <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -208,7 +207,19 @@ export default function SpecificDate({
             </div>
           )}
         </div>
-        
+
+        {/* Remarks — placed below the status card */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Remarks</label>
+          <textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Add any notes or remarks for this day..."
+            rows={3}
+            className="p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700 outline-none resize-none text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+          />
+        </div>
+
         <button onClick={() => setIsModalOpen(true)} disabled={isProcessing} className="w-full py-2 mt-2 bg-mocha text-white rounded-md dark:bg-[#d88a64] hover:bg-mocha/80 disabled:opacity-50 disabled:cursor-not-allowed font-bold">
           Save Daily Logs
         </button>
