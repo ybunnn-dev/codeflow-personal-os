@@ -22,6 +22,41 @@ function daysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
 }
 
+/** "HH:mm" → total minutes since midnight */
+function toMinutes(t: string): number {
+  if (!t) return 0;
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+
+/**
+ * Compute rendered hours and minutes for a day.
+ * AM session: time_in_am → 12:00 (fixed out)
+ * PM session: 13:00 (fixed in) → time_out_pm
+ * Only counts a session if the relevant clock-in/out exists.
+ */
+function computeRendered(r?: { time_in_am: string; time_out_am: string; time_in_pm: string; time_out_pm: string }): { hours: number; minutes: number } {
+  if (!r) return { hours: 0, minutes: 0 };
+
+  let total = 0;
+
+  // AM: from time_in_am to 12:00
+  if (r.time_in_am) {
+    const inAm = toMinutes(r.time_in_am);
+    const outAm = 12 * 60; // fixed 12:00 PM
+    if (outAm > inAm) total += outAm - inAm;
+  }
+
+  // PM: from 13:00 to time_out_pm
+  if (r.time_out_pm) {
+    const inPm = 13 * 60; // fixed 1:00 PM
+    const outPm = toMinutes(r.time_out_pm);
+    if (outPm > inPm) total += outPm - inPm;
+  }
+
+  return { hours: Math.floor(total / 60), minutes: total % 60 };
+}
+
 // ── DOCX — two DTRs side-by-side on one Letter page ───────────────────────
 
 async function buildDocx(params: {
@@ -162,6 +197,9 @@ async function buildDocx(params: {
     for (let d = 1; d <= 31; d++) {
       const r       = records[d];
       const isEmpty = d > totalDays;
+      const { hours, minutes } = isEmpty ? { hours: 0, minutes: 0 } : computeRendered(r);
+      const hasTime = !isEmpty && (hours > 0 || minutes > 0);
+
       dataRows.push(
         new TableRow({
           height: { value: 220, rule: "atLeast" },
@@ -171,8 +209,8 @@ async function buildDocx(params: {
             bc([tr(!isEmpty && r?.time_out_am ? fmt(r.time_out_am) : "")], { w: C[2] }),
             bc([tr(!isEmpty && r?.time_in_pm  ? fmt(r.time_in_pm)  : "")], { w: C[3] }),
             bc([tr(!isEmpty && r?.time_out_pm ? fmt(r.time_out_pm) : "")], { w: C[4] }),
-            ec(C[5]),
-            ec(C[6]),
+            bc([tr(hasTime ? String(hours)   : "")], { w: C[5] }),
+            bc([tr(hasTime ? String(minutes) : "")], { w: C[6] }),
           ],
         })
       );
@@ -464,6 +502,9 @@ async function buildXlsx(params: {
   for (let d = 1; d <= 31; d++) {
     const rowNum = d + 7;
     const r = records[d];
+    const { hours, minutes } = d <= totalDays ? computeRendered(r) : { hours: 0, minutes: 0 };
+    const hasTime = d <= totalDays && (hours > 0 || minutes > 0);
+
     ws.getRow(rowNum).height = 16;
     ["A","B","C","D","E","F","G"].forEach((col, i) => {
       const c = ws.getCell(`${col}${rowNum}`);
@@ -473,7 +514,8 @@ async function buildXlsx(params: {
         r?.time_out_am ? fmt(r.time_out_am) : "",
         r?.time_in_pm  ? fmt(r.time_in_pm)  : "",
         r?.time_out_pm ? fmt(r.time_out_pm) : "",
-        "", "",
+        hasTime ? hours   : "",
+        hasTime ? minutes : "",
       ][i];
       c.border = allBord;
       c.alignment = center;

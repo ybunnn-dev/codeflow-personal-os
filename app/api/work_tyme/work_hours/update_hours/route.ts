@@ -2,23 +2,19 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 
 function toDateTime(date: string, time: string): string {
-  // date is already "YYYY-MM-DD" from the fix below
   return new Date(`${date}T${time}:00.000Z`).toISOString();
 }
 
 export async function PUT(request: Request) {
   const data = await request.json();
-  const { id, ...payload } = data;
+  const { id, userId, ...payload } = data; // <-- destructure userId out separately
 
-  // Extract the correct local date string from the ISO date sent by client
-  // e.g. "2026-02-19T16:00:00.000Z" in UTC = Feb 20 in PHT
-  // So we parse it as local time instead
   const localDate = new Date(payload.date);
   const baseDate = [
     localDate.getFullYear(),
     String(localDate.getMonth() + 1).padStart(2, '0'),
     String(localDate.getDate()).padStart(2, '0'),
-  ].join('-'); // "2026-02-20"
+  ].join('-');
 
   const normalizedPayload = {
     ...payload,
@@ -27,18 +23,21 @@ export async function PUT(request: Request) {
     time_out_am: payload.time_out_am ? toDateTime(baseDate, payload.time_out_am) : null,
     time_in_pm:  payload.time_in_pm  ? toDateTime(baseDate, payload.time_in_pm)  : null,
     time_out_pm: payload.time_out_pm ? toDateTime(baseDate, payload.time_out_pm) : null,
+    remarks: payload.remarks ?? null,
   };
 
   let savedRecord;
 
   if (id) {
+    // UPDATE: userId is not needed since the record already belongs to the user
     savedRecord = await prisma.workHours.update({
       where: { id },
       data: normalizedPayload,
     });
   } else {
+    // CREATE: userId is required to link the new record to the user
     savedRecord = await prisma.workHours.create({
-      data: normalizedPayload,
+      data: { ...normalizedPayload, userId },
     });
   }
 

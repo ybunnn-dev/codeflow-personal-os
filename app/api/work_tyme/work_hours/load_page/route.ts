@@ -57,6 +57,7 @@ export async function GET(request: Request) {
         time_out_am: toTimeString(record.time_out_am),
         time_in_pm:  toTimeString(record.time_in_pm),
         time_out_pm: toTimeString(record.time_out_pm),
+        remarks: record.remarks ?? "", // <-- add this
     };
     });
 
