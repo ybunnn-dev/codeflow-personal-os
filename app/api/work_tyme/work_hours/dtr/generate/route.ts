@@ -2,6 +2,17 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
+function computeMonthTotal(
+  records: Record<number, { time_in_am: string; time_out_am: string; time_in_pm: string; time_out_pm: string }>,
+  totalDays: number
+): { hours: number; minutes: number } {
+  let total = 0;
+  for (let d = 1; d <= totalDays; d++) {
+    const { hours, minutes } = computeRendered(records[d]);
+    total += hours * 60 + minutes;
+  }
+  return { hours: Math.floor(total / 60), minutes: total % 60 };
+}
 
 function toTimeString(date: Date | null): string {
   if (!date) return "";
@@ -216,6 +227,8 @@ async function buildDocx(params: {
       );
     }
 
+    const { hours: tHours, minutes: tMinutes } = computeMonthTotal(records, totalDays);
+
     const totalRow = new TableRow({
       children: [
         new TableCell({
@@ -225,8 +238,8 @@ async function buildDocx(params: {
           margins: { top: 25, bottom: 25, left: 50, right: 50 },
           children: [p([tr("Total", { bold: true })], AlignmentType.RIGHT)],
         }),
-        ec(C[5]),
-        ec(C[6]),
+        bc([tr(tHours > 0 || tMinutes > 0 ? String(tHours)   : "")], { w: C[5] }),
+        bc([tr(tHours > 0 || tMinutes > 0 ? String(tMinutes) : "")], { w: C[6] }),
       ],
     });
 
@@ -523,13 +536,23 @@ async function buildXlsx(params: {
     });
   }
 
+  const { hours: tHours, minutes: tMinutes } = computeMonthTotal(records, totalDays);
+  const hasTotal = tHours > 0 || tMinutes > 0;
+
   const TR = 39;
   ws.mergeCells(`A${TR}:E${TR}`);
   ws.getCell(`A${TR}`).value = "Total";
   ws.getCell(`A${TR}`).alignment = { horizontal: "right", vertical: "middle" };
   ws.getCell(`A${TR}`).font = { bold: true, name: "Arial Narrow", size: 9 };
   ws.getCell(`A${TR}`).border = allBord;
-  ["F","G"].forEach(col => { ws.getCell(`${col}${TR}`).border = allBord; });
+  ws.getCell(`F${TR}`).value = hasTotal ? tHours   : "";
+  ws.getCell(`F${TR}`).border = allBord;
+  ws.getCell(`F${TR}`).alignment = center;
+  ws.getCell(`F${TR}`).font = { bold: true, name: "Arial Narrow", size: 9 };
+  ws.getCell(`G${TR}`).value = hasTotal ? tMinutes : "";
+  ws.getCell(`G${TR}`).border = allBord;
+  ws.getCell(`G${TR}`).alignment = center;
+  ws.getCell(`G${TR}`).font = { bold: true, name: "Arial Narrow", size: 9 };
 
   ws.mergeCells("A41:G42");
   ws.getCell("A41").value =
@@ -553,7 +576,7 @@ async function buildXlsx(params: {
   ws.mergeCells("A49:G49");
   ws.getCell("A49").value = "In Charge";
   ws.getCell("A49").font = { name: "Arial Narrow", size: 9 };
-
+  
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
 
