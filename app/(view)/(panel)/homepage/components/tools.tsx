@@ -1,33 +1,48 @@
 // app/(view)/(panel)/homepage/components/tools_section.tsx
 
 import React from 'react';
-import Link from 'next/link'; // 1. Import Link
+import Link from 'next/link';
+// Import your new icon. (Adjust the relative path if necessary)
+import WorkTymeIcon from '@/app/(view)/icons/svg/worktyme'; 
+import HireMe from '@/app/(view)/icons/svg/hire_me'; 
 
-// 2. Add the href paths to your applications array
 const applications = [
   {
     name: "Smart Doc",
     description: "An archiving system for managing, routing, and tracking soft copies of documents.",
     color: "bg-blue-100 dark:bg-blue-900/30",
-    href: "/smart_doc" 
+    href: "/smart_doc",
+    icon: null // Fallback to initial character 
   },
   {
     name: "PM+",
     description: "A comprehensive project manager system containing essential project management and tracking tools.",
     color: "bg-purple-100 dark:bg-purple-900/30",
-    href: "/pm_plus"
+    href: "/pm_plus",
+    icon: null 
   },
   {
     name: "Inventory++",
     description: "A smart inventory management system designed to seamlessly track stocks and resources.",
     color: "bg-green-100 dark:bg-green-900/30",
-    href: "/inventory"
+    href: "/inventory",
+    icon: null
   },
   {
     name: "WorkTyme",
     description: "A smart OJT time tracker for logging hours and managing internship progress.",
     color: "bg-orange-100 dark:bg-orange-900/30",
-    href: "/work_tyme/dashboard" // <--- Points directly to your new layout!
+    href: "/work_tyme/dashboard",
+    // Call the icon here and add some Tailwind sizing classes
+    icon: <WorkTymeIcon className="w-12 h-12" /> 
+  },
+  {
+    name: "HireMe",
+    description: "HireMe empowers job seekers to track applications, manage opportunities, and stay organized throughout their job search journey.",
+    color: "bg-yellow-100 dark:bg-yellow-900/30",
+    href: "/hire_me/dashboard",
+    // Call the icon here and add some Tailwind sizing classes
+    icon: <HireMe className="w-12 h-12" /> 
   }
 ];
 
@@ -45,15 +60,18 @@ export default function ToolsSection() {
         
         {/* Render Actual Apps */}
         {applications.map((app, index) => (
-          // 3. Change this from a <div> to a <Link>
           <Link 
             key={index} 
             href={app.href}
             className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 p-4 flex gap-4 h-40 cursor-pointer border border-transparent dark:border-slate-700 block group"
           >
-            {/* App Icon Placeholder */}
+            {/* App Icon / Placeholder */}
             <div className={`w-24 h-24 ${app.color} rounded-lg flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-105`}>
-               <span className="text-2xl font-bold opacity-40">{app.name.charAt(0)}</span>
+               {app.icon ? (
+                 app.icon
+               ) : (
+                 <span className="text-2xl font-bold opacity-40">{app.name.charAt(0)}</span>
+               )}
             </div>
             
             {/* App Details */}

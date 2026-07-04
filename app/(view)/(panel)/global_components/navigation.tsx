@@ -31,6 +31,7 @@ export default function Navigation() {
     if (path.includes("/pm_plus")) return "PM+";       
     if (path.includes("/inventory")) return "Inventory++";
     if (path.includes("/work_tyme")) return "WorkTyme";
+    if (path.includes("/hire_me")) return "HireMe";
     return null; 
   };
 
