@@ -11,6 +11,7 @@ export default function Sidebar() {
     {
       name: "Dashboard",
       href: "/hire_me/dashboard",
+      activePaths: ["/hire_me/dashboard"],
       icon: (
         <svg className="w-5 h-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -20,10 +21,11 @@ export default function Sidebar() {
     {
     name: "Job Listings",
     href: "/hire_me/job_list",
+    activePaths: ["/hire_me/job_list", "/hire_me/job_details"],
     icon: (
         <svg 
         className="w-5 h-5 mr-3"
-        fill="currentColor" // <-- Changed this line
+        fill="currentColor"
         version="1.1" 
         id="Capa_1" 
         xmlns="http://www.w3.org/2000/svg" 
@@ -62,7 +64,9 @@ export default function Sidebar() {
         </p>
         <nav className="space-y-1">
           {navItems.map((item) => {
-            const isActive = pathname?.includes(item.href);
+            const isActive = item.activePaths.some((path) =>
+              pathname?.includes(path)
+            );
             return (
               <Link
                 key={item.name}

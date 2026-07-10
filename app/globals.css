@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 /* This tells Tailwind v4 to read your TypeScript config */
-@config "../tailwind.config.ts"; 
+@config "../tailwind.config.ts";
 
 /* If you have custom CSS, put it below */
 @theme {
   /* You can also define variables here in the future */
 }
 
-body > [data-nextjs-toast],
-body > [data-nextjs-scroll-restoration-position],
+body>[data-nextjs-toast],
+body>[data-nextjs-scroll-restoration-position],
 #next-route-announcer {
   display: none !important;
 }
@@ -17,4 +17,34 @@ body > [data-nextjs-scroll-restoration-position],
 /* If it is the new floating toolbar */
 div:has(> svg[aria-label="Next.js logomark"]) {
   display: none !important;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-backdrop {
+  animation: backdropFadeIn 0.2s ease-out forwards;
+}
+
+.animate-modal {
+  animation: modalFadeIn 0.2s ease-out forwards;
 }
