@@ -53,6 +53,42 @@ export default function Sidebar() {
         </g>
         </svg>
     )
+    },
+    {
+      name: "Profile",
+      href: "/hire_me/profile",
+      activePaths: ["/hire_me/profile"],
+      icon: (
+        <svg 
+          className="w-5 h-5 mr-3"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+          <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            <g id="style=fill">
+              <g id="profile">
+                <path 
+                  id="vector (Stroke)" 
+                  fillRule="evenodd" 
+                  clipRule="evenodd" 
+                  d="M6.75 6.5C6.75 3.6005 9.1005 1.25 12 1.25C14.8995 1.25 17.25 3.6005 17.25 6.5C17.25 9.3995 14.8995 11.75 12 11.75C9.1005 11.75 6.75 9.3995 6.75 6.5Z" 
+                  fill="currentColor"
+                ></path>
+                <path 
+                  id="rec (Stroke)" 
+                  fillRule="evenodd" 
+                  clipRule="evenodd" 
+                  d="M4.25 18.5714C4.25 15.6325 6.63249 13.25 9.57143 13.25H14.4286C17.3675 13.25 19.75 15.6325 19.75 18.5714C19.75 20.8792 17.8792 22.75 15.5714 22.75H8.42857C6.12081 22.75 4.25 20.8792 4.25 18.5714Z" 
+                  fill="currentColor"
+                ></path>
+              </g>
+            </g>
+          </g>
+        </svg>
+      )
     }
   ];
 
