@@ -125,11 +125,15 @@ export default function PersonalDetails() {
                             className={inputClasses} 
                         />
                     </div>
-
-                    <div className=''>
-
-                    </div>
-
+                </div>
+                <div className="w-full">
+                    <label className={labelClasses}>Professional Summary</label>
+                    <textarea 
+                        name="notes" 
+                        id="notes" 
+                        className={`${inputClasses} h-32 resize-none overflow-y-auto w-full`}
+                        placeholder="Enter additional details...">                   
+                    </textarea>
                 </div>
             </div>
         </div>   
